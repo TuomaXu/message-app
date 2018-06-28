@@ -26,8 +26,9 @@ export default class HomeListItem extends Component {
 
     return (
         <div
-            onClick={()=>{
+            onClick={(e)=>{
                 if(this.props.onItemClick){
+                    e.stopPropagation();
                     this.props.onItemClick();
                 }   
             }}
@@ -40,8 +41,8 @@ export default class HomeListItem extends Component {
                         extra={moment(this.props.createdAt).format('YYYY-MM-DD HH:mm')}
                     />
                     <Card.Body>
-                        <span>
-                        {this.props.content}
+                        <span id='content'>
+                            {this.props.content}
                         </span>
                         <Grid
                             data={images}
@@ -68,5 +69,3 @@ export default class HomeListItem extends Component {
     )
   }
 }
-
-

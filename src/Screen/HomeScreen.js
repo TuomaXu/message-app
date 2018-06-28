@@ -18,7 +18,7 @@ export default class HomeScreen extends Component {
 
     async componentDidMount(){
 
-        if(!userManager.isLogin()){
+        if(userManager.isLogin() === false){
             this.props.history.replace('/');
             return;
         }
@@ -26,6 +26,10 @@ export default class HomeScreen extends Component {
         const result = await messageManager.allMessages()
         if(result.success === false){
             Toast.fail(result.errorMessage);
+            if(result.errorCode === 10004){
+                userManager.logout();
+                this.props.history.replace('/');
+            }
             return;
         }
         this.setState((preState)=>{
@@ -33,7 +37,6 @@ export default class HomeScreen extends Component {
                 dataSource:preState.dataSource.cloneWithRows(result.data)
             }   
         })
-
     }
 
     constructor(props) {
@@ -52,16 +55,19 @@ export default class HomeScreen extends Component {
     onRefresh = async()=>{
         try {
             this.setState({refreshing:true});
-            const result = await messageManager.allMessages()
+            const result = await messageManager.allMessages();
+            this.setState({refreshing:false});
             if(result.success === false){
                 Toast.fail(result.errorMessage);
-                this.setState({refreshing:false});
+                if(result.errorCode === 10004){
+                    userManager.logout();
+                    this.props.history.replace('/');
+                }
                 return;
             }
             this.setState((preState)=>{
                 return{
                     dataSource:preState.dataSource.cloneWithRows(result.data),
-                    refreshing:false
                 }   
             })
         } catch (error) {
@@ -104,18 +110,20 @@ export default class HomeScreen extends Component {
                     onRefresh={this.onRefresh}
                 />
             }
-            renderRow={(message)=>{
-                return (
-                    <HomeListItem 
-                        {...message}
-                        onItemClick={()=>{
-                            this.props.history.push('/CommentScreen',message)
-                        }} 
-                    />
-                )
-            }}
+            renderRow={this.renderRow}
         />
       </div>
     )
   }
+
+    renderRow = (message)=>{
+        return (
+            <HomeListItem 
+                {...message}
+                onItemClick={()=>{
+                    this.props.history.push('/CommentScreen/'+message.id)
+                }} 
+            />
+        )
+    }
 }

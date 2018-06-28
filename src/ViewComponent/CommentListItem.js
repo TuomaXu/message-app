@@ -23,7 +23,7 @@ export default class HomeListItem extends Component {
                         extra={moment(this.props.createdAt).format('YYYY-MM-DD HH:mm')}
                     />
                     <Card.Body>
-                        <span>
+                        <span id='content'>
                             {this.props.content}
                         </span>
                     </Card.Body>

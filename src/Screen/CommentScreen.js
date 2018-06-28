@@ -24,11 +24,15 @@ export default class CommentScreen extends Component {
             this.props.history.replace('/');
             return;
         }
-
-        const result = await messageManager.allComments(this.props.history.location.state.id)
+        const messageID = this.props.match.params.id;
+        const result = await messageManager.allComments(messageID)
         console.log(result)
         if(result.success === false){
             Toast.fail(result.errorMessage);
+            if(result.errorCode === 10004){
+                userManager.logout();
+                this.props.history.replace('/');
+            }
             return;
         }
 
@@ -65,6 +69,10 @@ export default class CommentScreen extends Component {
             const result = await messageManager.allComments(this.props.history.location.state.id);
             if(result.success === false){
                 Toast.fail(result.errorMessage);
+                if(result.errorCode === 10004){
+                    userManager.logout();
+                    this.props.history.replace('/');
+                }
                 this.setState({refreshing:false});
                 return;
             }
@@ -92,7 +100,8 @@ export default class CommentScreen extends Component {
                 <span
                     key={1}
                     onClick={()=>{
-                        this.props.history.push('/CreateCommentScreen',{id:this.props.history.location.state.id});
+                        const messageID = this.props.match.params.id;
+                        this.props.history.push('/CreateCommentScreen/'+messageID);
                     }}
                 >发评论</span>
             ]}
@@ -100,13 +109,7 @@ export default class CommentScreen extends Component {
         <ListView
             useBodyScroll={true}
             dataSource={this.state.dataSource}
-            renderRow={(message)=>{
-                return (
-                    <CommentListItem 
-                        {...message}
-                    />
-                )
-            }}
+            renderRow={this.renderRow}
             pullToRefresh={
                 <PullToRefresh
                     refreshing={this.state.refreshing}
@@ -117,4 +120,13 @@ export default class CommentScreen extends Component {
       </div>
     )
   }
+
+    renderRow = (comment)=>{
+        return (
+            <CommentListItem 
+                {...comment}
+            />
+        )
+    }
 }
+

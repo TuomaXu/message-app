@@ -18,8 +18,8 @@ class App extends Component {
         <Route path={'/RegisterScreen'} component={RegisterScreen} />
         <Route path={'/HomeScreen'} component={HomeScreen} />
         <Route path={'/CreateMessageScreen'} component={CreateMessageScreen} />
-        <Route path={'/CommentScreen'} component={CommentScreen} />
-        <Route path={'/CreateCommentScreen'} component={CreateCommentScreen} />
+        <Route path={'/CommentScreen/:id'} component={CommentScreen} />
+        <Route path={'/CreateCommentScreen/:id'} component={CreateCommentScreen} />
       </div>
     );
   }

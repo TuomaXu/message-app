@@ -20,6 +20,12 @@ import userManager from '../DataServer/UserManager';
 
 export default class CreateMessageScreen extends Component {
 
+    componentDidMount(){
+        if(userManager.isLogin() === false){
+            this.props.history.replace('/');
+        }
+    }
+
     constructor(props) {
       super(props)
     
@@ -29,13 +35,6 @@ export default class CreateMessageScreen extends Component {
          files:[]
       }
     }
-
-    componentWillMount(){
-        if(!userManager.isLogin()){
-            this.props.history.replace('/');
-        }
-    }
-    
 
   render() {
     return (
@@ -73,20 +72,7 @@ export default class CreateMessageScreen extends Component {
             <WhiteSpace/>
             <Button
                 type={'primary'}
-                onClick={async()=>{
-                    Toast.loading('内容上传中...',0);
-                    const resutl = await messageManager.postMessage(this.state.title,this.state.content,this.state.files);
-                    Toast.hide();
-                    if(resutl.success === false){
-                        Toast.fail(resutl.errorMessage);
-                        return;
-                    }
-                    Modal.alert('提交成功','点击确认键返回',[{
-                        text:'确认',
-                        onPress:()=>{this.props.history.goBack()}
-                    }])
-
-                }}
+                onClick={this.submitMessage}
             >
                 提交
             </Button>
@@ -94,4 +80,18 @@ export default class CreateMessageScreen extends Component {
       </div>
     )
   }
+
+    submitMessage = async()=>{
+        Toast.loading('内容上传中...',0);
+        const resutl = await messageManager.postMessage(this.state.title,this.state.content,this.state.files);
+        Toast.hide();
+        if(resutl.success === false){
+            Toast.fail(resutl.errorMessage);
+            return;
+        }
+        Modal.alert('提交成功','点击确认键返回',[{
+            text:'确认',
+            onPress:()=>{this.props.history.goBack()}
+        }])
+    }
 }
